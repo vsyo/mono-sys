@@ -5,15 +5,17 @@ const OUTPUT_FILENAME: &str = "bindings.rs";
 
 fn main() {
     // Look for mono library using pkg-config
-    let mono = pkg_config::Config::default()
+    let libmono_2 = pkg_config::Config::default()
         .probe("mono-2")
         .expect("could not find mono library");
-    println!("found mono library!");
-    println!("{:#?}", mono);
 
-    // Tell cargo to tell rustc to link the system mono-2.0
-    // shared library.
+    println!("found mono library!");
+    println!("{:#?}", libmono_2);
+
+    // Tell cargo to tell rustc to link the system libraries.
     println!("cargo:rustc-link-lib=mono-2.0");
+    println!("cargo:rustc-link-lib=stdc++");
+    println!("cargo:rustc-link-lib=z");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed={WRAPPER_HEADER_PATH}");
@@ -21,10 +23,12 @@ fn main() {
     let bindings = Builder::default()
         .header(WRAPPER_HEADER_PATH)
         .clang_args(
-            mono.include_paths
+            libmono_2.include_paths
                 .iter()
                 .map(|path| "-I".to_owned() + path.to_str().unwrap()),
         )
+        .ignore_functions()
+        .ignore_methods()
         .generate()
         .expect("failed to generate bindings");
 
