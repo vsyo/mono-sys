@@ -27,8 +27,6 @@ fn main() {
                 .iter()
                 .map(|path| "-I".to_owned() + path.to_str().unwrap()),
         )
-        .ignore_functions()
-        .ignore_methods()
         .generate()
         .expect("failed to generate bindings");
 
