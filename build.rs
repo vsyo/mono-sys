@@ -18,9 +18,19 @@ fn main() {
     println!("{:#?}", mono_include_paths);
 
     // Tell cargo to tell rustc to link the system libraries.
-    println!("cargo:rustc-link-lib=mono-2.0");
-    println!("cargo:rustc-link-lib=stdc++");
-    println!("cargo:rustc-link-lib=z");
+
+    #[cfg(target_os = "linux")]
+    {
+        println!("cargo:rustc-link-lib=mono-2.0");
+        println!("cargo:rustc-link-lib=stdc++");
+        println!("cargo:rustc-link-lib=z");
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        println!("cargo:rustc-link-lib=mono-2.0-sgen");
+        println!("cargo:rustc-link-search=C:\\Program Files\\Mono\\lib");
+    }
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed={WRAPPER_HEADER_PATH}");
